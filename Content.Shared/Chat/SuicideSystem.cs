@@ -5,7 +5,6 @@ using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Prototypes;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Database;
-using Content.Shared.Ghost;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction.Events;
@@ -28,6 +27,7 @@ public sealed class SuicideSystem : EntitySystem
     [Dependency] private readonly MobStateSystem _mobStateSystem = default!;
     [Dependency] private readonly SharedHandsSystem _hands = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private readonly SuicideSystem _suicide = default!;
     [Dependency] private readonly TagSystem _tagSystem = default!;
 
     private static readonly ProtoId<TagPrototype> CannotSuicideTag = "CannotSuicide";
@@ -73,8 +73,7 @@ public sealed class SuicideSystem : EntitySystem
         if (!CanSuicide(victim))
             return false;
 
-        var ev = new SuicideEvent(victim);
-        RaiseLocalEvent(victim, ev);
+        RaiseLocalEvent(victim, new SuicideEvent(victim));
 
         // Since the player is already dead the log will not contain their username.
         if (session != null)
@@ -192,8 +191,15 @@ public sealed class SuicideSystem : EntitySystem
         var selfMessage = Loc.GetString("suicide-command-default-text-self");
         _popup.PopupEntity(selfMessage, victim, victim);
 
+        if (args.DamageSpecifier != null)
+        {
+            _suicide.ApplyLethalDamage(victim, args.DamageSpecifier);
+            args.Handled = true;
+            return;
+        }
+
         args.DamageType ??= "Bloodloss";
-        ApplyLethalDamage(victim, args.DamageType);
+        _suicide.ApplyLethalDamage(victim, args.DamageType);
         args.Handled = true;
     }
 }
