@@ -1,3 +1,4 @@
+using Content.Server.GameTicking;
 using Content.Server.Popups;
 using Content.Shared.Administration;
 using Content.Shared.Chat;
@@ -39,7 +40,7 @@ namespace Content.Server.Chat.Commands
                 return;
             }
 
-            var suicideSystem = _e.System<Shared.Chat.SuicideSystem>();
+            var suicideSystem = _e.System<SuicideSystem>();
 
             if (_e.HasComponent<AdminFrozenComponent>(victim))
             {
@@ -50,7 +51,7 @@ namespace Content.Server.Chat.Commands
                 return;
             }
 
-            if (suicideSystem.AttemptSuicide(victim))
+            if (suicideSystem.Suicide(victim))
                 return;
 
             shell.WriteLine(Loc.GetString("ghost-command-denied"));

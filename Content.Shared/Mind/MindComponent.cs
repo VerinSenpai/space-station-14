@@ -81,10 +81,22 @@ public sealed partial class MindComponent : Component
     public EntityUid? OwnedEntity { get; set; }
 
     /// <summary>
-    ///     Prevents user from abandoning their character either by suicide or ghosting.
+    ///     An enumerable over all the objective entities this mind has.
+    /// </summary>
+    [ViewVariables, Obsolete("Use Objectives field")]
+    public IEnumerable<EntityUid> AllObjectives => Objectives;
+
+    /// <summary>
+    ///     Prevents user from ghosting out
     /// </summary>
     [DataField]
-    public bool PreventCharacterAbandon { get; set; }
+    public bool PreventGhosting { get; set; }
+
+    /// <summary>
+    ///     Prevents user from suiciding
+    /// </summary>
+    [DataField]
+    public bool PreventSuicide { get; set; }
 
     /// <summary>
     /// Mind Role Entities belonging to this Mind are stored in this container.
